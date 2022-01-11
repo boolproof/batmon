@@ -3,12 +3,12 @@ package main
 import (
 	"time"
 
+	"github.com/batmon/domain"
 	"github.com/batmon/ui"
 	termbox "github.com/nsf/termbox-go"
 )
 
 const ver = "1.0"
-const timeFmt = "15:04:05"
 const timeInterval = 1
 
 func main() {
@@ -42,13 +42,7 @@ loop:
 
 			}
 		case <-ticker.C:
-			data := make([]ui.DataItem, 0)
-			data = append(data, ui.DataItem{
-				Label: "Time",
-				Value: time.Now().Format(timeFmt),
-			})
-
-			m.dataPanel.SetData(data)
+			m.dataPanel.SetData(domain.ReadBatteryStatus())
 			m.Redraw()
 		}
 	}
@@ -57,17 +51,11 @@ loop:
 func NewModel() Model {
 	vw, vh := termbox.Size()
 
-	data := make([]ui.DataItem, 0)
-	data = append(data, ui.DataItem{
-		Label: "Time",
-		Value: time.Now().Format(timeFmt),
-	})
-
 	m := Model{
 		vw:        vw,
 		vh:        vh,
-		statusBar: ui.NewStatusBar(vw, " BatMon "+ver+"   github.com/boolproof/batmon", termbox.ColorBlack, termbox.ColorCyan),
-		dataPanel: ui.NewDataPanel(2, 2, data, termbox.ColorDefault, termbox.ColorDefault),
+		statusBar: ui.NewStatusBar(vw, " BatMon "+ver, termbox.ColorBlack, termbox.ColorCyan),
+		dataPanel: ui.NewDataPanel(2, 2, domain.ReadBatteryStatus(), termbox.ColorDefault, termbox.ColorDefault),
 	}
 
 	return m
